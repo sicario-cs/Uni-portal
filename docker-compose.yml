@@ -1,0 +1,76 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo_db
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - uni-net
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis
+    container_name: redis_db
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - uni-net
+    volumes:
+      - redis_data:/data
+
+  cassandra:
+    image: cassandra
+    container_name: cassandra_db
+    restart: always
+    ports:
+      - "9042:9042"
+    networks:
+      - uni-net
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+
+  neo4j:
+    image: neo4j
+    container_name: neo4j_db
+    restart: always
+    environment:
+      - NEO4J_AUTH=neo4j/password
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    networks:
+      - uni-net
+    volumes:
+      - neo4j_data:/data
+
+  node:
+    build: ./server
+    container_name: node_server
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+      - redis
+      - cassandra
+      - neo4j
+    networks:
+      - uni-net
+
+networks:
+  uni-net:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  redis_data:
+  cassandra_data:
+  neo4j_data:
