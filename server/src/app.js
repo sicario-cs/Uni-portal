@@ -19,15 +19,34 @@ app.use((req, res, next) => {
 });
 
 const authRoutes = require("./routes/auth.routes");
-
+const gradeRoutes = require("./routes/grade.routes");
+const courseRoutes = require("./routes/courses.routes")
+const collegeRoutes = require("./routes/college.routes");
+const enrollmentRoutes = require("./routes/enrollment.routes");
+const instructorRoutes = require("./routes/instructor.routes");
+const departmentRoutes = require("./routes/department.routes");
 // Use routes
 app.use("/api/auth", authRoutes);
+app.use("/api/grades", gradeRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/colleges", collegeRoutes);
+app.use("/api/enrollments", enrollmentRoutes);
+app.use("/api/instructors", instructorRoutes);
+app.use("/api/departments", departmentRoutes);
 
 // Test route
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal server error";
 
+  res.status(status).json({
+    message,
+  });
+});
 
 module.exports = app;
