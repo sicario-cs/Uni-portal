@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 // Database connections
 require("./src/config/db.mongo");
 require("./src/config/db.redis");

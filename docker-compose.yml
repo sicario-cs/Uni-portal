@@ -70,6 +70,10 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+    environment:
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-change_me_please_use_a_strong_secret_key_in_production}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
     depends_on:
       - mongo
       - redis
