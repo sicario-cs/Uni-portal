@@ -23,6 +23,19 @@ services:
     volumes:
       - redis_data:/data
 
+  redis-gui:
+    image: redislabs/redisinsight:latest
+    container_name: redis_gui
+    restart: always
+    ports:
+      - "5540:5540"
+    networks:
+      - uni-net
+    volumes:
+      - redis_gui_data:/db
+    depends_on:
+      - redis
+
   cassandra:
     image: cassandra
     container_name: cassandra_db
@@ -72,5 +85,6 @@ networks:
 volumes:
   mongo_data:
   redis_data:
+  redis_gui_data:
   cassandra_data:
   neo4j_data:
