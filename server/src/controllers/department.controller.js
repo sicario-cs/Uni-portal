@@ -1,6 +1,6 @@
 const Department = require("../models/department.model");
 const College = require("../models/college.model");
-
+const { setCache, getCache } = require("../utils/cache");
 
 exports.createDepartment = async (req, res, next) => {
   try {
@@ -80,16 +80,25 @@ exports.getDepartmentById = async (req, res, next) => {
 exports.getDepartmentsByCollege = async (req, res, next) => {
   try {
     const { collegeId } = req.params;
+    const cacheKey = `departments:${collegeId}`;
+
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      return res.json({ cached: true, data: cached });
+    }
 
     const departments = await Department.find({ collegeId })
       .populate("headInstructorId")
       .sort({ code: 1 });
 
-    res.json(departments);
+    await setCache(cacheKey, departments, 3600);
+
+    res.json({ cached: false, data: departments });
   } catch (err) {
     next(err);
   }
 };
+
 
 exports.updateDepartment = async (req, res, next) => {
   try {

@@ -1,5 +1,5 @@
 const College = require("../models/college.model");
-
+const { setCache, getCache } = require("../utils/cache");
 
 exports.createCollege = async (req, res, next) => {
   try {
@@ -32,8 +32,18 @@ exports.createCollege = async (req, res, next) => {
 
 exports.getAllColleges = async (req, res, next) => {
   try {
+    const cacheKey = "all_colleges";
+
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      return res.json({ cached: true, data: cached });
+    }
+
     const colleges = await College.find().sort({ code: 1 });
-    res.json(colleges);
+
+    await setCache(cacheKey, colleges, 3600); // كاش لمدة ساعة
+
+    res.json({ cached: false, data: colleges });
   } catch (err) {
     next(err);
   }

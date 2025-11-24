@@ -1,8 +1,31 @@
 const express = require("express");
+require("./config/db.redis");
+const session = require("express-session");
+const RedisStore = require("connect-redis").RedisStore;
+const redisClient = require("./config/redisClient");
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const redisStore = new RedisStore({
+  client: redisClient,
+  prefix: "session:",
+});
+
+app.use(
+  session({
+    store: redisStore,
+    secret: process.env.SESSION_SECRET || "secret_key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      maxAge: 1000 * 60 * 60 * 24,
+    },
+  })
+);
 
 // Normalize URLs - fixes issue with trailing newlines (%0A) in URLs
 app.use((req, res, next) => {
@@ -22,6 +45,7 @@ const authRoutes = require("./routes/auth.routes");
 const gradeRoutes = require("./routes/grade.routes");
 const courseRoutes = require("./routes/courses.routes")
 const collegeRoutes = require("./routes/college.routes");
+const studentRoutes = require("./routes/student.routes");
 const enrollmentRoutes = require("./routes/enrollment.routes");
 const instructorRoutes = require("./routes/instructor.routes");
 const departmentRoutes = require("./routes/department.routes");
@@ -30,6 +54,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/grades", gradeRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/colleges", collegeRoutes);
+app.use("/api/students", studentRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/instructors", instructorRoutes);
 app.use("/api/departments", departmentRoutes);

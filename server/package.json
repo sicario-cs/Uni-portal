@@ -15,8 +15,10 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cassandra-driver": "^4.8.0",
+    "connect-redis": "^9.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "express-session": "^1.18.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.20.1",
     "neo4j-driver": "^6.0.1",
