@@ -1,9 +1,8 @@
-// server/src/services/auth.service.js
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
+const neo4jService = require("./neo4j.service");
 
 async function registerUser({ username, email, fullName, password, role }) {
-  // check existing user
   const existing = await User.findOne({
     $or: [{ username }, { email }],
   });
@@ -24,6 +23,13 @@ async function registerUser({ username, email, fullName, password, role }) {
     role,
   });
 
+  if (role === "student") {
+    await neo4jService.createStudentNode(
+      student._id.toString(),
+      user.fullName
+    );
+  }
+  
   return user;
 }
 

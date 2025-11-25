@@ -52,7 +52,7 @@ const gradeSchema = new mongoose.Schema(
 
     submittedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // أو Instructor
+      ref: "User", 
       required: true,
     },
 

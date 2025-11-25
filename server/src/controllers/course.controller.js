@@ -1,5 +1,5 @@
 const Course = require("../models/course.model");
-
+const neo4jService = require("../services/neo4j.service");
 
 exports.getAllCourses = async (req, res, next) => {
   try {
@@ -45,6 +45,12 @@ exports.createCourse = async (req, res, next) => {
       description,
       prerequisites,
     });
+     
+    await neo4jService.createCourseNode(
+      course._id.toString(),
+      course.name,
+      course.code
+    );
 
     res.status(201).json(course);
   } catch (err) {

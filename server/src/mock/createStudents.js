@@ -10,7 +10,6 @@ async function run() {
 
     console.log("Connected!");
 
-    // Get all users with role = student
     const studentsUsers = await User.find({ role: "student" });
 
     console.log("Total users with student role:", studentsUsers.length);

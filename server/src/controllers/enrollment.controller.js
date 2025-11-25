@@ -1,5 +1,5 @@
 const Enrollment = require("../models/enrollment.model");
-
+const neo4jService = require("../services/neo4j.service");
 
 exports.createEnrollment = async (req, res, next) => {
   try {
@@ -16,6 +16,17 @@ exports.createEnrollment = async (req, res, next) => {
       courseId,
       semester,
     });
+
+    await neo4jService.addEnrollmentRelation(
+      studentId.toString(),
+      courseId.toString()
+    );
+    
+    await neo4jService.addEnrollmentInstructorRelation(
+      studentId.toString(),
+      instructorId.toString(),
+      semester
+    );
 
     res.status(201).json(enrollment);
   } catch (err) {

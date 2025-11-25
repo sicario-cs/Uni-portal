@@ -17,7 +17,7 @@ exports.getAllStudents = async (req, res, next) => {
   }
 };
 
-// GET /api/students/:id
+
 exports.getStudentById = async (req, res, next) => {
   try {
     const student = await Student.findById(req.params.id).populate("userId");
@@ -32,7 +32,7 @@ exports.getStudentById = async (req, res, next) => {
   }
 };
 
-// GET /api/students/by-user/:userId
+
 exports.getStudentByUser = async (req, res, next) => {
   try {
     const student = await Student.findOne({

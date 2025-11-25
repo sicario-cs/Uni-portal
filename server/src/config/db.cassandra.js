@@ -1,6 +1,6 @@
 const cassandra = require("cassandra-driver");
 
-// Cassandra connection
+
 const cassandraClient = new cassandra.Client({
   contactPoints: ["cassandra"],
   localDataCenter: "datacenter1"

@@ -1,5 +1,6 @@
 const Instructor = require("../models/instructor.model");
 const User = require("../models/user.model");
+const neo4jService = require("../services/neo4j.service");
 
 exports.createInstructor = async (req, res, next) => {
   try {
@@ -33,7 +34,12 @@ exports.createInstructor = async (req, res, next) => {
       office,
       phone,
     });
-
+ 
+    await neo4jService.createInstructorNode(
+      instructor._id.toString(),
+      instructor.userId.fullName
+    );
+    
     res.status(201).json(instructor);
   } catch (err) {
     next(err);

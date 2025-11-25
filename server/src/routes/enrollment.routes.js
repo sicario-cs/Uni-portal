@@ -1,4 +1,3 @@
-// server/src/routes/enrollment.routes.js
 const express = require("express");
 const router = express.Router();
 

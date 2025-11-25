@@ -36,7 +36,6 @@ const courseSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // العلاقات الحقيقية بنسويها في Neo4j لاحقًا
     prerequisites: {
       type: [String], 
       default: [],

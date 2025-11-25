@@ -1,7 +1,7 @@
 const Grade = require("../models/grade.model");
 const Enrollment = require("../models/enrollment.model");
 
-// تحويل درجة رقمية إلى حرف
+
 function toLetterGrade(numeric) {
   if (numeric == null) return null;
   if (numeric >= 90) return "A";

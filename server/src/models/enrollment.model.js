@@ -1,4 +1,3 @@
-// server/src/models/enrollment.model.js
 const mongoose = require("mongoose");
 
 const enrollmentSchema = new mongoose.Schema(
@@ -16,7 +15,12 @@ const enrollmentSchema = new mongoose.Schema(
       ref: "Course",
       required: true,
     },
-
+    
+    instructorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Instructor",
+      default: null,
+    },
     semester: {
       type: String,
       required: true,

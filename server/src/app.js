@@ -3,6 +3,8 @@ require("./config/db.redis");
 const session = require("express-session");
 const RedisStore = require("connect-redis").RedisStore;
 const redisClient = require("./config/redisClient");
+require("./config/db.neo4j");
+
 const app = express();
 
 app.use(express.json());
@@ -43,6 +45,7 @@ app.use((req, res, next) => {
 
 const authRoutes = require("./routes/auth.routes");
 const gradeRoutes = require("./routes/grade.routes");
+const graphRoutes = require("./routes/graph.routes");
 const courseRoutes = require("./routes/courses.routes")
 const collegeRoutes = require("./routes/college.routes");
 const studentRoutes = require("./routes/student.routes");
@@ -51,6 +54,7 @@ const instructorRoutes = require("./routes/instructor.routes");
 const departmentRoutes = require("./routes/department.routes");
 // Use routes
 app.use("/api/auth", authRoutes);
+app.use("/api/graph", graphRoutes);
 app.use("/api/grades", gradeRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/colleges", collegeRoutes);
@@ -59,12 +63,12 @@ app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/instructors", instructorRoutes);
 app.use("/api/departments", departmentRoutes);
 
-// Test route
+
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-// Error handling middleware
+
 app.use((err, req, res, next) => {
   const status = err.status || err.statusCode || 500;
   const message = err.message || "Internal server error";
