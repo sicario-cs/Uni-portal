@@ -53,22 +53,21 @@ async function createInstructorNode(id, name) {
 }
 
 async function addEnrollmentInstructorRelation(studentId, instructorId, semester) {
-    const session = driver.session();
-    try {
-      await session.run(
-        `
-        MATCH (s:Student {id: $studentId})
-        MATCH (i:Instructor {id: $instructorId})
-        MERGE (s)-[:ENROLLED_WITH {semester: $semester}]->(i)
-        `,
-        { studentId, instructorId, semester }
-      );
-    } finally {
-      session.close();
-    }
+  const session = driver.session();
+  try {
+    await session.run(
+      `
+      MATCH (s:Student {id: $studentId})
+      MATCH (i:Instructor {id: $instructorId})
+      MERGE (s)-[:ENROLLED_WITH {semester: $semester}]->(i)
+      `,
+      { studentId, instructorId, semester }
+    );
+  } finally {
+    await session.close();
   }
+}
 
-  
 async function addTeachesRelation(instructorId, courseId) {
   const session = driver.session();
   try {
@@ -90,5 +89,6 @@ module.exports = {
   createCourseNode,
   addEnrollmentRelation,
   createInstructorNode,
-  addTeachesRelation
+  addEnrollmentInstructorRelation,
+  addTeachesRelation,
 };
