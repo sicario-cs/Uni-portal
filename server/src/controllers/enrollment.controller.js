@@ -1,5 +1,6 @@
 const Enrollment = require("../models/enrollment.model");
 const neo4jService = require("../services/neo4j.service");
+const activityService = require("../services/activity.service");
 
 exports.createEnrollment = async (req, res, next) => {
   try {
@@ -21,11 +22,12 @@ exports.createEnrollment = async (req, res, next) => {
       studentId.toString(),
       courseId.toString()
     );
+
     
-    await neo4jService.addEnrollmentInstructorRelation(
+    await activityService.logActivity(
       studentId.toString(),
-      instructorId.toString(),
-      semester
+      "enrolled_course",
+      courseId.toString()
     );
 
     res.status(201).json(enrollment);
@@ -91,6 +93,17 @@ exports.updateFinalGrade = async (req, res, next) => {
     if (!enrollment) {
       return res.status(404).json({ message: "Enrollment not found" });
     }
+
+    
+    await activityService.logActivity(
+      enrollment.studentId.toString(),
+      "grade_updated",
+      enrollment.courseId.toString(),
+      {
+        newGrade: numeric,
+        letter,
+      }
+    );
 
     res.json(enrollment);
   } catch (err) {

@@ -4,7 +4,6 @@ const session = require("express-session");
 const RedisStore = require("connect-redis").RedisStore;
 const redisClient = require("./config/redisClient");
 require("./config/db.neo4j");
-
 const app = express();
 
 app.use(express.json());
@@ -47,6 +46,7 @@ const authRoutes = require("./routes/auth.routes");
 const gradeRoutes = require("./routes/grade.routes");
 const graphRoutes = require("./routes/graph.routes");
 const courseRoutes = require("./routes/courses.routes")
+const activityRoutes = require("./routes/activity.routes");
 const collegeRoutes = require("./routes/college.routes");
 const studentRoutes = require("./routes/student.routes");
 const enrollmentRoutes = require("./routes/enrollment.routes");
@@ -60,6 +60,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/colleges", collegeRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
+app.use("/api/activity", activityRoutes);
 app.use("/api/instructors", instructorRoutes);
 app.use("/api/departments", departmentRoutes);
 

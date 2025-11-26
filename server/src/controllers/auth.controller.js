@@ -1,4 +1,5 @@
 const authService = require("../services/auth.service");
+const activityService = require("../services/activity.service");
 
 
 exports.register = async (req, res, next) => {
@@ -52,10 +53,18 @@ exports.login = async (req, res, next) => {
 };
 
 
-exports.logout = (req, res) => {
-  req.session.destroy(() => {
-    res.json({ message: "Logged out successfully" });
-  });
+exports.logout = async (req, res, next) => {
+  try {
+    if (req.session.user && req.session.user.id) {
+      await activityService.logActivity(req.session.user.id, "logout");
+    }
+
+    req.session.destroy(() => {
+      res.json({ message: "Logged out successfully" });
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 
