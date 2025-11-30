@@ -3,7 +3,8 @@ const Student = require("../models/student.model");
 const User = require("../models/user.model");
 const Enrollment = require("../models/enrollment.model");
 const Grade = require("../models/grade.model");
-
+const neo4jService = require("../services/neo4j.service");
+const activityService = require("../services/activity.service");
 
 exports.getAllStudents = async (req, res, next) => {
   try {
@@ -17,6 +18,96 @@ exports.getAllStudents = async (req, res, next) => {
   }
 };
 
+exports.getStudentOverview = async (req, res, next) => {
+  try {
+    const { studentId } = req.params;
+
+    if (!studentId) {
+      return res.status(400).json({ message: "studentId is required" });
+    }
+
+    // 1) بيانات الطالب الأساسية من Mongo
+    const studentPromise = Student.findById(studentId)
+      .populate("userId")
+      .populate("major"); // لو major ref على Department
+
+    // 2) الـ Enrollments من Mongo
+    const enrollmentsPromise = Enrollment.find({ studentId })
+      .populate("courseId")
+      .populate("instructorId");
+
+    // 3) الكورسات + العلامات من Neo4j
+    const graphCoursesPromise = neo4jService.getStudentCoursesWithGrades(
+      studentId.toString()
+    );
+
+    // 4) آخر نشاط من Cassandra
+    const activityPromise = activityService.getRecentActivity(
+      studentId.toString(),
+      30
+    );
+
+    const [studentDoc, enrollments, graphCourses, recentActivity] =
+      await Promise.all([
+        studentPromise,
+        enrollmentsPromise,
+        graphCoursesPromise,
+        activityPromise,
+      ]);
+
+    if (!studentDoc) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // حساب GPA بسيط من Mongo
+    const grades = enrollments
+      .map(e => e.finalGrade?.numeric)
+      .filter(v => typeof v === "number");
+
+    let gpa = null;
+    if (grades.length) {
+      const sum = grades.reduce((a, b) => a + b, 0);
+      gpa = Math.round((sum / grades.length) * 100) / 100;
+    }
+
+    const basicInfo = {
+      studentId: studentDoc._id,
+      userId: studentDoc.userId?._id,
+      fullName: studentDoc.userId?.fullName,
+      username: studentDoc.userId?.username,
+      email: studentDoc.userId?.email,
+      major: studentDoc.major?.name || studentDoc.major || null,
+      level: studentDoc.level,
+      gpaFromMongo: gpa,
+      status: studentDoc.status,
+    };
+
+    const mongoCourses = enrollments.map(e => ({
+      enrollmentId: e._id,
+      courseId: e.courseId?._id,
+      courseName: e.courseId?.name,
+      courseCode: e.courseId?.code,
+      instructorId: e.instructorId?._id,
+      instructorTitle: e.instructorId?.title,
+      semester: e.semester,
+      finalGrade: e.finalGrade || null,
+    }));
+
+    return res.json({
+      basicInfo,
+      mongo: {
+        enrollmentsCount: enrollments.length,
+        courses: mongoCourses,
+      },
+      graph: {
+        courses: graphCourses,
+      },
+      activity: recentActivity,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.getStudentById = async (req, res, next) => {
   try {

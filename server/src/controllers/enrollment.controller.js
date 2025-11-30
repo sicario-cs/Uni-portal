@@ -94,15 +94,11 @@ exports.updateFinalGrade = async (req, res, next) => {
       return res.status(404).json({ message: "Enrollment not found" });
     }
 
-    
-    await activityService.logActivity(
+    // Sync grade to Neo4j edge
+    await neo4jService.updateEnrollmentGrade(
       enrollment.studentId.toString(),
-      "grade_updated",
       enrollment.courseId.toString(),
-      {
-        newGrade: numeric,
-        letter,
-      }
+      { letter, numeric }
     );
 
     res.json(enrollment);

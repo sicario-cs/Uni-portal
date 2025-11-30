@@ -73,3 +73,37 @@ exports.getInstructorById = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.updateInstructor = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const allowedFields = ["departmentId", "title", "office", "phone", "status"];
+    const updateData = {};
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
+
+    if (Object.keys(updateData).length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Provide at least one field to update" });
+    }
+
+    const instructor = await Instructor.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    }).populate("userId");
+
+    if (!instructor) {
+      return res.status(404).json({ message: "Instructor not found" });
+    }
+
+    res.json(instructor);
+  } catch (err) {
+    next(err);
+  }
+};
+;

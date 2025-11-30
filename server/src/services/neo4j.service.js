@@ -68,6 +68,63 @@ async function addEnrollmentInstructorRelation(studentId, instructorId, semester
   }
 }
 
+async function updateEnrollmentGrade(studentId, courseId, grade) {
+  const session = driver.session();
+
+  try {
+    await session.run(
+      `
+      MATCH (s:Student {id: $studentId})-[r:ENROLLED_IN]->(c:Course {id: $courseId})
+      SET r.numeric = $numeric,
+          r.letter = $letter
+      `,
+      {
+        studentId,
+        courseId,
+        numeric: grade.numeric,
+        letter: grade.letter,
+      }
+    );
+  } finally {
+    await session.close();
+  }
+}
+
+async function getStudentCoursesWithGrades(studentId) {
+  const session = driver.session();
+  try {
+    const result = await session.run(
+      `
+      MATCH (s:Student {id: $studentId})-[r:ENROLLED_IN]->(c:Course)
+      OPTIONAL MATCH (i:Instructor)-[:TEACHES]->(c)
+      RETURN
+        c.id AS courseId,
+        c.name AS name,
+        c.code AS code,
+        r.numeric AS numeric,
+        r.letter AS letter,
+        r.semester AS semester,
+        collect(DISTINCT { id: i.id, name: i.name }) AS instructors
+      `,
+      { studentId }
+    );
+
+    return result.records.map(row => ({
+      courseId: row.get("courseId"),
+      name: row.get("name"),
+      code: row.get("code"),
+      grade: {
+        numeric: row.get("numeric"),
+        letter: row.get("letter"),
+      },
+      semester: row.get("semester"),
+      instructors: row.get("instructors"),
+    }));
+  } finally {
+    await session.close();
+  }
+}
+
 async function addTeachesRelation(instructorId, courseId) {
   const session = driver.session();
   try {
@@ -90,5 +147,6 @@ module.exports = {
   addEnrollmentRelation,
   createInstructorNode,
   addEnrollmentInstructorRelation,
+  getStudentCoursesWithGrades,
   addTeachesRelation,
 };

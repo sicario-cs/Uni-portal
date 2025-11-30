@@ -9,7 +9,7 @@ router.get("/:id", studentController.getStudentById);
 router.get("/by-user/:userId", studentController.getStudentByUser);
 router.patch("/:id", studentController.updateStudent);
 
-
+router.get("/:studentId/overview", studentController.getStudentOverview);
 router.get("/:id/enrollments", studentController.getStudentEnrollments);
 router.get("/:id/grades", studentController.getStudentGrades);
 

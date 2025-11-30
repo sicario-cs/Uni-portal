@@ -1,13 +1,35 @@
 const router = require("express").Router();
 const activityService = require("../services/activity.service");
 
-router.get("/:studentId", async (req, res) => {
+router.get("/search", async (req, res) => {
   try {
-    const studentId = req.params.studentId;
-    const data = await activityService.getStudentActivity(studentId);
-    res.json(data);
+    const {
+      studentId,
+      action,
+      courseId,
+      from,
+      to,
+      limit
+    } = req.query;
+
+    const data = await activityService.searchActivity({
+      studentId,
+      action,
+      courseId,
+      from,
+      to,
+      limit: limit ? parseInt(limit) : undefined,
+    });
+
+    res.json({
+      count: data.length,
+      results: data,
+    });
   } catch (err) {
-    res.status(500).json({ message: "Error fetching activity", error: err });
+    res.status(500).json({
+      message: err.message,
+      error: err,
+    });
   }
 });
 
