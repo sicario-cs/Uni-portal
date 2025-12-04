@@ -5,6 +5,7 @@ services:
     image: mongo
     container_name: mongo_db
     restart: always
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27017:27017"
     networks:
@@ -12,6 +13,48 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  mongo2:
+    image: mongo
+    container_name: mongo2
+    restart: always
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo2_data:/data/db
+    networks:
+      - uni-net
+
+  mongo3:
+    image: mongo
+    container_name: mongo3
+    restart: always
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo3_data:/data/db
+    networks:
+      - uni-net
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_MONGODB_AUTH_DATABASE: "admin"
+      ME_CONFIG_SITE_BASEURL: "/"
+    networks:
+      - uni-net
+    depends_on:
+      - mongo
+      - mongo2
+      - mongo3
   redis:
     image: redis
     container_name: redis_db
@@ -91,6 +134,8 @@ networks:
 
 volumes:
   mongo_data:
+  mongo2_data:
+  mongo3_data:
   redis_data:
   redis_gui_data:
   cassandra_data:

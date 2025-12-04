@@ -1,7 +1,7 @@
 const { createClient } = require("redis");
 
 const redisClient = createClient({
-  url: "redis://redis_db:6379"  
+  url: "redis://redis:6379"  
 });
 
 redisClient.connect().catch(console.error);

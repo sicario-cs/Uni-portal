@@ -50,7 +50,7 @@ async function getRecentActivity(studentId, limit = 30) {
 
   let rows = result.rows;
 
-  // sort desc by time
+ 
   rows.sort((a, b) => b.timestamp - a.timestamp);
 
   return rows.slice(0, limit);

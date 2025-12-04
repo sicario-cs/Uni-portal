@@ -13,7 +13,6 @@ async function run() {
 
     const session = driver.session();
 
-    // 1) جلب كل المستخدمين المدرسين
     const users = await User.find({ role: "instructor" });
     console.log(`Found ${users.length} instructor users.`);
 

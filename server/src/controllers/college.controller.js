@@ -15,7 +15,7 @@ exports.createCollege = async (req, res, next) => {
     if (existing) {
       return res.status(400).json({ message: "College code already exisit" });
     }
-
+    
     const college = await College.create({
       code,
       name,
@@ -41,7 +41,7 @@ exports.getAllColleges = async (req, res, next) => {
 
     const colleges = await College.find().sort({ code: 1 });
 
-    await setCache(cacheKey, colleges, 3600); // كاش لمدة ساعة
+    await setCache(cacheKey, colleges, 3600); 
 
     res.json({ cached: false, data: colleges });
   } catch (err) {
